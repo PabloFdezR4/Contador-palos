@@ -45,7 +45,8 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      padding: 20px;
+      /* Padding responsive: 2vh arriba/lados, pero 12vh abajo para subir los botones */
+      padding: 2vh 5vw 15vh 5vw;
       position: relative;
       z-index: 2;
     }
@@ -128,7 +129,8 @@
 
     .count-display {
       font-family: 'Russo One', sans-serif;
-      font-size: 6.5rem;
+      /* Tamaño dinámico: mínimo 4rem, ideal 22% del ancho, máximo 9rem */
+      font-size: clamp(4rem, 22vw, 9rem);
       line-height: 1;
       color: #fff;
       text-shadow: 
@@ -137,7 +139,7 @@
     }
 
     .credits-display {
-      margin-top: 10px;
+      margin-top: 2vh;
       font-family: 'Rajdhani', sans-serif;
       font-weight: 700;
       font-size: 1.5rem;
@@ -156,7 +158,7 @@
       width: 100%;
       display: flex;
       justify-content: center; /* Centra el grupo de botones */
-      margin-bottom: 20px;
+      margin-bottom: 0; /* El margen lo controla ahora el padding del container */
     }
 
     /* Grupo para alinear botones verticalmente */
