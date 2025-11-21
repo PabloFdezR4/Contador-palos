@@ -1,181 +1,311 @@
-<html lang="es"><head>
+<!DOCTYPE html>
+<html lang="es">
+<head>
   <meta charset="UTF-8">
-  <title>Contador de Palos RL</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>RL Palo Tracker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  
+  <!-- Fuentes: Rajdhani (muy parecida a la UI de RL) y Russo One -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Russo+One&display=swap" rel="stylesheet">
+
   <style>
+    /* --- RESET --- */
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
     }
-    html, body {
-      height: 100%;
-      overflow: hidden; /* Sin scroll */
-    }
+
     body {
-      background: #000;
-      color: #fff;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      min-height: 100vh;
+      background-color: #000;
+      /* Fondo de Estadio Futurista / Rocket League vibes */
+      background-image: 
+        linear-gradient(to bottom, rgba(0, 15, 30, 0.6), rgba(0, 0, 0, 0.9)),
+        url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2670&auto=format&fit=crop');
+      background-size: cover;
+      background-position: center;
+      font-family: 'Rajdhani', sans-serif;
+      height: 100vh;
+      width: 100vw;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
-      padding: 16px 16px 20px;
-      -webkit-user-select: none;
-      user-select: none;
+      color: #fff;
+      overflow: hidden;
     }
-    .top-bar {
+
+    /* --- UI FRAME --- */
+    .app-container {
       width: 100%;
+      height: 100%;
+      max-width: 500px;
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* --- HEADER ESTILO TITULO DE JUEGO --- */
+    .header {
+      text-align: center;
+      margin-top: 20px;
+      text-transform: uppercase;
+    }
+    
+    .header h1 {
+      font-family: 'Russo One', sans-serif;
+      font-size: 2.2rem;
+      color: #fff;
+      text-shadow: 
+        0 0 10px rgba(0, 198, 255, 0.8),
+        2px 2px 0px #000;
+      letter-spacing: 2px;
+      font-style: italic;
+      transform: skewX(-5deg);
+    }
+
+    .header .subtitle {
       font-size: 1rem;
-      opacity: 0.9;
+      color: #ff8d1e; /* Naranja RL */
+      font-weight: 700;
+      letter-spacing: 4px;
+      text-shadow: 1px 1px 2px #000;
+      margin-top: -5px;
     }
-    .label {
-      font-size: 0.9rem;
-      opacity: 0.8;
-    }
-    .counter-wrapper {
+
+    /* --- PANEL CENTRAL (MARCADOR) --- */
+    .score-panel {
       flex: 1;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      position: relative;
+    }
+
+    /* Caja del contador estilo HUD */
+    .counter-box {
+      background: linear-gradient(135deg, rgba(0, 18, 50, 0.8), rgba(0, 10, 30, 0.9));
+      border: 2px solid #00c6ff;
+      border-right: 2px solid #005eff;
+      border-bottom: 2px solid #005eff;
+      border-radius: 12px 4px 12px 4px; /* Esquinas asimétricas */
+      padding: 30px 50px;
       text-align: center;
-      gap: 6px;
+      box-shadow: 
+        0 0 20px rgba(0, 198, 255, 0.3),
+        inset 0 0 50px rgba(0, 0, 0, 0.8);
+      transform: skewX(-5deg);
+      position: relative;
+      min-width: 220px;
     }
-    .counter-label {
-      font-size: 1rem;
-      opacity: 0.8;
+
+    /* Decoración de lineas en el HUD */
+    .counter-box::before {
+      content: '';
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 8px 2px 8px 2px;
+      pointer-events: none;
     }
-    .counter-value {
-      font-size: 5.5rem;
-      font-weight: 700;
-      letter-spacing: 0.08em;
-    }
-    .euro-value {
+
+    .label {
+      font-family: 'Rajdhani', sans-serif;
       font-size: 1.2rem;
-      opacity: 0.9;
+      font-weight: 700;
+      color: #a0cfff;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
     }
-    .buttons {
+
+    .count-display {
+      font-family: 'Russo One', sans-serif;
+      font-size: 6.5rem;
+      line-height: 1;
+      color: #fff;
+      text-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.5),
+        4px 4px 0px rgba(0,0,0,0.8);
+    }
+
+    .credits-display {
+      margin-top: 10px;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: #ffd700; /* Dorado créditos */
+      text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+      background: rgba(0,0,0,0.6);
+      padding: 4px 12px;
+      border-radius: 4px;
+      transform: skewX(5deg); /* Contrarrestar inclinación padre */
+      display: inline-block;
+      border: 1px solid #665500;
+    }
+
+    /* --- CONTROLES INFERIORES --- */
+    .controls {
       width: 100%;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
     }
-    .btn {
-      border: none;
-      border-radius: 999px;
-      padding: 14px;
-      font-size: 2rem;
-      font-weight: 700;
-      background: #fff;
-      color: #000;
+
+    /* Botón Principal "Boost" */
+    .btn-boost {
       width: 100%;
-      text-align: center;
-      box-shadow: 0 4px 18px rgba(255, 255, 255, 0.2);
-      transition: transform 0.1s ease, box-shadow 0.1s ease, opacity 0.1s ease;
-    }
-    .btn:active {
-      transform: scale(0.97);
-      box-shadow: 0 2px 10px rgba(255, 255, 255, 0.15);
-      opacity: 0.9;
-    }
-    .btn-minus {
-      font-size: 1.2rem;
-      padding: 8px;
-      max-width: 140px;
-      align-self: flex-end;
-      background: #111;
+      max-width: 280px;
+      padding: 20px;
+      border: none;
+      background: linear-gradient(90deg, #ff8d1e, #ff4d00);
       color: #fff;
-      box-shadow: 0 3px 10px rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      font-family: 'Russo One', sans-serif;
+      font-size: 2rem;
+      text-transform: uppercase;
+      font-style: italic;
+      letter-spacing: 2px;
+      border-radius: 8px;
+      clip-path: polygon(10% 0, 100% 0, 100% 80%, 90% 100%, 0 100%, 0 20%);
+      box-shadow: 
+        0 0 15px rgba(255, 141, 30, 0.5),
+        inset 0 2px 0 rgba(255, 255, 255, 0.4);
+      cursor: pointer;
+      transition: transform 0.1s, filter 0.1s;
+      position: relative;
+      text-shadow: 2px 2px 0 rgba(150, 40, 0, 1);
     }
-    .btn-minus:active {
-      box-shadow: 0 1px 6px rgba(255, 255, 255, 0.1);
+
+    .btn-boost:active {
+      transform: scale(0.98);
+      filter: brightness(1.2);
     }
+
+    /* Botón Secundario */
+    .btn-secondary {
+      background: rgba(0, 20, 40, 0.8);
+      border: 1px solid #444;
+      color: #ccc;
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 12px 30px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      width: 160px;
+      text-align: center;
+    }
+
+    .btn-secondary:active {
+      background: rgba(255, 50, 50, 0.3);
+      border-color: #ff3232;
+      color: #fff;
+    }
+
+    /* Grid de fondo animada */
+    .hex-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: 
+        radial-gradient(circle at 50% 50%, transparent 0%, #000 100%),
+        url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 0l25.98 15v30L30 60 4.02 45V15z' fill-opacity='0.05' fill='%23ffffff' fill-rule='evenodd'/%3E%3C/svg%3E");
+      z-index: 1;
+      pointer-events: none;
+    }
+
   </style>
 </head>
 <body>
-  <div class="top-bar">
-    <span class="label">Contador de palos</span>
-    <span class="label" id="euroDisplayTop">0,07 €</span>
-  </div>
 
-  <div class="counter-wrapper">
-    <div class="counter-label">Total palos</div>
-    <div class="counter-value" id="counter">7</div>
-    <div class="euro-value" id="euroDisplayBottom">0,07 €</div>
-  </div>
+  <!-- Fondo de hexágonos sutil -->
+  <div class="hex-bg"></div>
 
-  <div class="buttons">
-    <button class="btn" id="plusBtn">+1</button>
-    <button class="btn btn-minus" id="minusBtn">-1</button>
+  <div class="app-container">
+    
+    <div class="header">
+      <h1>PALO TRACKER</h1>
+      <div class="subtitle">SEASON 14</div>
+    </div>
+
+    <div class="score-panel">
+      <div class="counter-box">
+        <div class="label">Total Hits</div>
+        <div class="count-display" id="counter">0</div>
+        <div class="credits-display" id="euroDisplay">0,00 CR</div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <button class="btn-boost" id="plusBtn">
+        ¡PALO!
+      </button>
+      
+      <button class="btn-secondary" id="minusBtn">
+        Corregir (-1)
+      </button>
+    </div>
+
   </div>
 
   <script>
-    const STORAGE_KEY = 'contador_palos_rl_v2';
+    const STORAGE_KEY = 'rl_palos_v3';
     let count = 0;
-    let storageOk = true;
 
-    function loadCount() {
-      try {
-        const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved !== null && !isNaN(parseInt(saved, 10))) {
-          count = parseInt(saved, 10);
-        } else {
-          count = 0;
-        }
-      } catch (e) {
-        storageOk = false;
-        count = 0;
-      }
-      updateDisplay();
-    }
-
-    function saveCount() {
-      if (!storageOk) return;
-      try {
-        localStorage.setItem(STORAGE_KEY, String(count));
-      } catch (e) {
-        storageOk = false;
-      }
-    }
-
-    function formatEuros(value) {
-      const euros = (value * 0.01).toFixed(2);
-      return euros.replace('.', ',') + ' €';
-    }
-
-    function updateDisplay() {
-      const counterEl = document.getElementById('counter');
-      const euroTop = document.getElementById('euroDisplayTop');
-      const euroBottom = document.getElementById('euroDisplayBottom');
-
+    const counterEl = document.getElementById('counter');
+    const euroEl = document.getElementById('euroDisplay');
+    
+    function updateUI() {
       counterEl.textContent = count;
-      const eurosText = formatEuros(count);
-      euroTop.textContent = eurosText;
-      euroBottom.textContent = eurosText;
+      // Simula créditos/euros
+      const val = (count * 0.01).toFixed(2).replace('.', ',');
+      euroEl.textContent = val + ' €';
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, count);
+    }
+
+    function load() {
+      const s = localStorage.getItem(STORAGE_KEY);
+      if(s) count = parseInt(s, 10);
+      updateUI();
     }
 
     document.getElementById('plusBtn').addEventListener('click', () => {
       count++;
-      saveCount();
-      updateDisplay();
+      save();
+      updateUI();
+      if(navigator.vibrate) navigator.vibrate(30); // Vibración más fuerte
     });
 
     document.getElementById('minusBtn').addEventListener('click', () => {
-      if (count > 0) {
+      if(count > 0) {
         count--;
-        saveCount();
-        updateDisplay();
+        save();
+        updateUI();
+        if(navigator.vibrate) navigator.vibrate(10);
       }
     });
 
-    loadCount();
+    load();
   </script>
-
-
-</body></html>
+</body>
+</html>
