@@ -5,7 +5,7 @@
   <title>RL Palo Tracker</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   
-  <!-- Fuentes: Rajdhani (muy parecida a la UI de RL) y Russo One -->
+  <!-- Fuentes: Rajdhani y Russo One -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@500;700&family=Russo+One&display=swap" rel="stylesheet">
@@ -22,7 +22,6 @@
 
     body {
       background-color: #000;
-      /* Fondo de Estadio Futurista / Rocket League vibes */
       background-image: 
         linear-gradient(to bottom, rgba(0, 15, 30, 0.6), rgba(0, 0, 0, 0.9)),
         url('https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2670&auto=format&fit=crop');
@@ -51,7 +50,7 @@
       z-index: 2;
     }
 
-    /* --- HEADER ESTILO TITULO DE JUEGO --- */
+    /* --- HEADER --- */
     .header {
       text-align: center;
       margin-top: 20px;
@@ -72,14 +71,14 @@
 
     .header .subtitle {
       font-size: 1rem;
-      color: #ff8d1e; /* Naranja RL */
+      color: #ff8d1e;
       font-weight: 700;
       letter-spacing: 4px;
       text-shadow: 1px 1px 2px #000;
       margin-top: -5px;
     }
 
-    /* --- PANEL CENTRAL (MARCADOR) --- */
+    /* --- SCORE PANEL --- */
     .score-panel {
       flex: 1;
       display: flex;
@@ -89,13 +88,12 @@
       position: relative;
     }
 
-    /* Caja del contador estilo HUD */
     .counter-box {
       background: linear-gradient(135deg, rgba(0, 18, 50, 0.8), rgba(0, 10, 30, 0.9));
       border: 2px solid #00c6ff;
       border-right: 2px solid #005eff;
       border-bottom: 2px solid #005eff;
-      border-radius: 12px 4px 12px 4px; /* Esquinas asimétricas */
+      border-radius: 12px 4px 12px 4px;
       padding: 30px 50px;
       text-align: center;
       box-shadow: 
@@ -106,7 +104,6 @@
       min-width: 220px;
     }
 
-    /* Decoración de lineas en el HUD */
     .counter-box::before {
       content: '';
       position: absolute;
@@ -144,30 +141,36 @@
       font-family: 'Rajdhani', sans-serif;
       font-weight: 700;
       font-size: 1.5rem;
-      color: #ffd700; /* Dorado créditos */
+      color: #ffd700;
       text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
       background: rgba(0,0,0,0.6);
       padding: 4px 12px;
       border-radius: 4px;
-      transform: skewX(5deg); /* Contrarrestar inclinación padre */
+      transform: skewX(5deg);
       display: inline-block;
       border: 1px solid #665500;
     }
 
-    /* --- CONTROLES INFERIORES --- */
+    /* --- CONTROLES (Updated Layout) --- */
     .controls {
       width: 100%;
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 15px;
+      justify-content: center; /* Centra el grupo de botones */
       margin-bottom: 20px;
+    }
+
+    /* Grupo para alinear botones verticalmente */
+    .buttons-group {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+      max-width: 280px; /* Mismo ancho máximo que el botón boost para alinear bordes */
+      gap: 10px;
     }
 
     /* Botón Principal "Boost" */
     .btn-boost {
-      width: 100%;
-      max-width: 280px;
+      width: 100%; /* Ocupa todo el ancho del grupo */
       padding: 20px;
       border: none;
       background: linear-gradient(90deg, #ff8d1e, #ff4d00);
@@ -193,22 +196,24 @@
       filter: brightness(1.2);
     }
 
-    /* Botón Secundario */
+    /* Botón Secundario "Corregir" */
     .btn-secondary {
+      align-self: flex-end; /* Alinear a la derecha del grupo */
       background: rgba(0, 20, 40, 0.8);
       border: 1px solid #444;
-      color: #ccc;
+      color: #aaa;
       font-family: 'Rajdhani', sans-serif;
       font-weight: 700;
-      font-size: 1.1rem;
-      padding: 12px 30px;
+      font-size: 0.9rem;
+      padding: 8px 20px;
       text-transform: uppercase;
       letter-spacing: 1px;
       border-radius: 4px;
       cursor: pointer;
       transition: all 0.2s;
-      width: 160px;
+      min-width: 100px;
       text-align: center;
+      transform: skewX(-10deg);
     }
 
     .btn-secondary:active {
@@ -217,7 +222,7 @@
       color: #fff;
     }
 
-    /* Grid de fondo animada */
+    /* Grid de fondo */
     .hex-bg {
       position: absolute;
       top: 0;
@@ -235,7 +240,6 @@
 </head>
 <body>
 
-  <!-- Fondo de hexágonos sutil -->
   <div class="hex-bg"></div>
 
   <div class="app-container">
@@ -254,13 +258,16 @@
     </div>
 
     <div class="controls">
-      <button class="btn-boost" id="plusBtn">
-        ¡PALO!
-      </button>
-      
-      <button class="btn-secondary" id="minusBtn">
-        CORREGIR
-      </button>
+      <!-- Grupo contenedor para alinear los botones -->
+      <div class="buttons-group">
+        <button class="btn-secondary" id="minusBtn">
+          CORREGIR
+        </button>
+        
+        <button class="btn-boost" id="plusBtn">
+          ¡PALO!
+        </button>
+      </div>
     </div>
 
   </div>
@@ -274,7 +281,6 @@
     
     function updateUI() {
       counterEl.textContent = count;
-      // Simula créditos/euros
       const val = (count * 0.01).toFixed(2).replace('.', ',');
       euroEl.textContent = val + ' €';
     }
@@ -293,7 +299,7 @@
       count++;
       save();
       updateUI();
-      if(navigator.vibrate) navigator.vibrate(30); // Vibración más fuerte
+      if(navigator.vibrate) navigator.vibrate(30);
     });
 
     document.getElementById('minusBtn').addEventListener('click', () => {
